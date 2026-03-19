@@ -1,13 +1,13 @@
 // src/components/RentalForm.tsx
 import { useState } from "react";
+import * as React from "react";
 import { useRentalFormData } from "./hooks/useRentalFormData";
-import { apiRequest } from "../lib/api"; // adjust path if needed
+import { apiRequest } from "../lib/api";
 
 export const RentalForm = () => {
-  // ----- Form state -------------------------------------------------
   const [form, setForm] = useState({
-    animalId: "",   // will hold the selected animal's id (string)
-    clientId: "",   // will hold the selected client's id (string)
+    animalId: "",
+    clientId: "",
     startDate: "",
     endDate: "",
     price: "",
@@ -17,22 +17,16 @@ export const RentalForm = () => {
 
   const { animals, clients, loading, error } = useRentalFormData();
 
-  // ----- Helper: show selected animal name/tag (your UX tweak) -----
-  const selectedAnimal = animals.find(
-    (a) => a.id === Number(form.animalId)
-  );
+  const selectedAnimal = animals.find((a) => a.id === Number(form.animalId));
 
-  // ----- Submit handler --------------------------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // NOTE: The backend still validates everything (Zod, overlap, injured, etc.)
       await apiRequest("/rentals", {
         method: "POST",
         body: JSON.stringify(form),
       });
-      alert("✅ Rental created successfully!");
-      // Optional: reset form after success
+      alert("Rental created successfully!");
       setForm({
         animalId: "",
         clientId: "",
@@ -43,51 +37,36 @@ export const RentalForm = () => {
         contractUrl: "",
       });
     } catch (err: any) {
-      // Show the exact message your backend returns (no silent failures)
-      alert(err.message || "❌ Something went wrong");
+      alert(err.message || "Something went wrong");
     }
   };
 
-  // ----- Render ----------------------------------------------------
-  if (loading) {
-    return <p>Loading ranch data…</p>;
-  }
-  if (error) {
-    return <p style={{ color: "red" }}>❌ {error}</p>;
-  }
+  if (loading) return <p>Loading ranch data...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: "500px", margin: "20px auto" }}>
-      {/* ---------- ANIMAL DROPDOWN ---------- */}
       <label style={{ display: "block", marginBottom: "8px" }}>
         Animal:*
         <select
           value={form.animalId || ""}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, animalId: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, animalId: e.target.value }))}
           required
         >
           <option value="">-- Select Available Animal --</option>
-          {/* 👉 FILTER: only show animals where isAvailable === true */}
-          {animals
-            .filter((a) => a.isAvailable)
-            .map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name} ({a.tagNumber})
-              </option>
-            ))}
+          {animals.filter((a) => a.isAvailable).map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name} ({a.tagNumber})
+            </option>
+          ))}
         </select>
       </label>
 
-      {/* ---------- CLIENT DROPDOWN ---------- */}
       <label style={{ display: "block", marginBottom: "8px" }}>
         Client:*
         <select
           value={form.clientId || ""}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, clientId: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, clientId: e.target.value }))}
           required
         >
           <option value="">-- Select Client --</option>
@@ -99,31 +78,18 @@ export const RentalForm = () => {
         </select>
       </label>
 
-      {/* ---------- SELECTED ANIMAL INFO (your UX tweak) ---------- */}
       {selectedAnimal && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "10px",
-            background: "#f0f8ff",
-            borderRadius: "4px",
-            fontSize: "0.9em",
-          }}
-        >
-          <strong>Selected Animal:</strong>{" "}
-          {selectedAnimal.name} ({selectedAnimal.tagNumber})
+        <div style={{ marginTop: "10px", padding: "10px", background: "#f0f8ff", borderRadius: "4px", fontSize: "0.9em" }}>
+          <strong>Selected Animal:</strong> {selectedAnimal.name} ({selectedAnimal.tagNumber})
         </div>
       )}
 
-      {/* ---------- THE REST OF YOUR FORM (keep as‑is) ---------- */}
       <label style={{ display: "block", marginBottom: "8px" }}>
         Start Date:*
         <input
           type="datetime-local"
           value={form.startDate}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, startDate: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, startDate: e.target.value }))}
           required
         />
       </label>
@@ -133,9 +99,7 @@ export const RentalForm = () => {
         <input
           type="datetime-local"
           value={form.endDate}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, endDate: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, endDate: e.target.value }))}
           required
         />
       </label>
@@ -146,9 +110,7 @@ export const RentalForm = () => {
           type="number"
           step="0.01"
           value={form.price}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, price: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
           required
         />
       </label>
@@ -157,9 +119,7 @@ export const RentalForm = () => {
         Notes:
         <textarea
           value={form.notes}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, notes: e.target.value }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
           rows={3}
         />
       </label>
@@ -169,12 +129,7 @@ export const RentalForm = () => {
         <input
           type="text"
           value={form.contractUrl}
-          onChange={(e) =>
-            setForm((prev) => ({
-              ...prev,
-              contractUrl: e.target.value,
-            }))
-          }
+          onChange={(e) => setForm((prev) => ({ ...prev, contractUrl: e.target.value }))}
           placeholder="https://example.com/contract.pdf"
         />
       </label>
@@ -187,7 +142,7 @@ export const RentalForm = () => {
           background: "#28a745",
           color: "white",
           border: "none",
-          borderRadius": "4px",
+          borderRadius: "4px",
           cursor: "pointer",
         }}
       >

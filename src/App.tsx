@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import * as React from 'react';
 import {
   Beef, Users, Calendar, Plus, Stethoscope, Tag, CheckCircle2,
   AlertCircle, Clock, Search, X, DollarSign,
@@ -460,7 +461,7 @@ export default function App() {
         {editAnimal && <EditAnimalModal animal={editAnimal} onClose={() => setEditAnimal(null)} onSuccess={() => handleSuccess('Animal updated!')} />}
         {deleteAnimal && <DeleteAnimalModal animal={deleteAnimal} onClose={() => setDeleteAnimal(null)} onSuccess={() => handleSuccess('Animal deleted.')} />}
       </AnimatePresence>
-      <AnimatePresence>{toast && <Toast key={toast.message} message={toast.message} type={toast.type} onClose={() => setToast(null)} />}</AnimatePresence>
+      <AnimatePresence>{toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}</AnimatePresence>
     </div>
   );
 }
