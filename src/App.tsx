@@ -14,6 +14,25 @@ interface Client { id: number; name: string; phone: string; email: string; organ
 interface Rental { id: number; animalId: number; clientId: number; startDate: string; endDate: string; status: string; price: number; animal: Animal; client: Client; }
 type Tab = 'dashboard' | 'animals' | 'clients' | 'rentals';
 
+// Helper: compute availability info for an animal
+function getAnimalAvailability(animalId: number, rentals: Rental[]) {
+  const now = new Date();
+  const activeRental = rentals.find(r => {
+    if (r.animalId !== animalId) return false;
+    const start = new Date(r.startDate);
+    const end = new Date(r.endDate);
+    return start <= now && end >= now && (r.status === 'active' || r.status === 'pending');
+  });
+  const upcomingRentals = rentals
+    .filter(r => r.animalId === animalId && new Date(r.startDate) > now && (r.status === 'active' || r.status === 'pending'))
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  return {
+    isAvailable: !activeRental,
+    currentRental: activeRental || null,
+    nextRental: upcomingRentals[0] || null,
+  };
+}
+
 const CATEGORIES = [
   { value: 'rodeo',    label: 'Rodeo',    emoji: '🤠', color: 'bg-amber-50 text-amber-700' },
   { value: 'beef',     label: 'Beef',     emoji: '🥩', color: 'bg-rose-50 text-rose-700' },
@@ -336,6 +355,7 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {filteredAnimals.map(animal => {
                       const cat = getCat(animal.category);
+                      const avail = getAnimalAvailability(animal.id, rentals);
                       return (
                         <motion.div key={animal.id} initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }}
                           className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all group relative">
@@ -343,6 +363,18 @@ export default function App() {
                           <div className="absolute top-4 right-4 flex gap-1 ">
                             <button onClick={() => setEditAnimal(animal)} className="p-1.5 bg-slate-100 hover:bg-blue-100 hover:text-blue-600 rounded-lg transition-colors"><Pencil className="w-3.5 h-3.5" /></button>
                             <button onClick={() => setDeleteAnimal(animal)} className="p-1.5 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 rounded-lg transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                          </div>
+                          {/* Availability badge */}
+                          <div className="mb-3">
+                            {avail.isAvailable ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Available
+                              </span>
+                            ) : avail.currentRental ? (
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-600">
+                                <AlertCircle className="w-3.5 h-3.5" /> Rented until {new Date(avail.currentRental.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                              </span>
+                            ) : null}
                           </div>
                           <div className="flex justify-between items-start mb-4">
                             <div className="w-11 h-11 bg-slate-50 rounded-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">{cat.emoji}</div>
@@ -355,6 +387,9 @@ export default function App() {
                           <div className="flex items-center gap-2 text-slate-400 text-sm"><Tag className="w-3.5 h-3.5" /><span className="font-mono font-semibold text-slate-600">{animal.tagNumber}</span><span className="text-slate-200">|</span><span>{animal.breed}</span></div>
                           <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-xs text-slate-400"><Stethoscope className="w-3.5 h-3.5" /><span>Born {new Date(animal.dateOfBirth).getFullYear()}</span></div>
+                            {avail.nextRental && (
+                              <div className="text-xs text-violet-500 font-medium">Next: {new Date(avail.nextRental.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
+                            )}
                           </div>
                         </motion.div>
                       );
