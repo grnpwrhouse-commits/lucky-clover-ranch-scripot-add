@@ -1,20 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+﻿# Lucky Clover Ranch
 
-# Run and deploy your AI Studio app
+AI Studio app - a full-stack React/Vite + Express/TSX project.
 
-This contains everything you need to run your app locally.
+## Quick Start
+1. Clone: git clone git@github.com:laserpanama/lucky-clover-ranch.git
+2. Install: npm install
+3. Set API key in .env.local
+4. Run: npm run dev
 
-View your app in AI Studio: https://ai.studio/apps/6efa1091-42f6-482d-aa6b-82f07db1bc5f
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## License
+MIT
