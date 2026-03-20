@@ -18,8 +18,8 @@ model Animal {
   name          String
   breed         String
   status        String         // e.g., "healthy", "injured", "rented"
-category    String   @default("rodeo")
-  dateOfBirth   DateTimecategory: z.string().optional(),
+dateOfBirth   DateTime
+  category      String   @default("rodeo")
 
   notes         String?
   createdAt     DateTime       @default(now())
