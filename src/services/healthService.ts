@@ -1,4 +1,4 @@
-import prisma from '../lib/prisma';
+import prisma from '..\/lib\/prisma';
 
 export const getHealthRecordsByAnimal = async (animalId: number) => {
   return prisma.healthRecord.findMany({

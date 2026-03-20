@@ -5,7 +5,7 @@ import {
   TrendingUp, Beef, Calendar, AlertTriangle
 } from "lucide-react";
 
-const API = 'https://victorious-abundance-production-cc5f.up.railway.app/api';
+const API = '/api';
 
 interface Animal { id: number; name: string; tagNumber: string; status: string; }
 interface Rental {

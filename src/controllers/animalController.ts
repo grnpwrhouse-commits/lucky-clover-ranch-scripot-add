@@ -14,7 +14,7 @@ const animalSchema = z.object({
 
 export const getAvailability = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const animals = await animalService.getAnimalsWithAvailability();
+    const animals = await animalService.animalService.getWithAvailability();
     res.json(animals);
   } catch (error) {
     next(error);
@@ -23,7 +23,7 @@ export const getAvailability = async (req: Request, res: Response, next: NextFun
 
 export const getAnimals = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const animals = await animalService.getAllAnimals();
+    const animals = await animalService.animalService.getAll();
     res.json(animals);
   } catch (error) {
     next(error);
@@ -32,7 +32,7 @@ export const getAnimals = async (req: Request, res: Response, next: NextFunction
 
 export const getAnimalById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const animal = await animalService.getAnimalById(Number(req.params.id));
+    const animal = await animalService.animalService.getById(Number(req.params.id));
     if (!animal) return res.status(404).json({ error: 'Animal not found' });
     res.json(animal);
   } catch (error) {
@@ -43,7 +43,7 @@ export const getAnimalById = async (req: Request, res: Response, next: NextFunct
 export const createAnimal = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = animalSchema.parse(req.body);
-    const animal = await animalService.createAnimal(data);
+    const animal = await animalService.animalService.create(data);
     res.status(201).json(animal);
   } catch (error) {
     next(error);
@@ -53,7 +53,7 @@ export const createAnimal = async (req: Request, res: Response, next: NextFuncti
 export const updateAnimal = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const data = animalSchema.partial().parse(req.body);
-    const animal = await animalService.updateAnimal(Number(req.params.id), data);
+    const animal = await animalService.animalService.update(Number(req.params.id), data);
     res.json(animal);
   } catch (error) {
     next(error);
@@ -62,7 +62,7 @@ export const updateAnimal = async (req: Request, res: Response, next: NextFuncti
 
 export const deleteAnimal = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await animalService.deleteAnimal(Number(req.params.id));
+    await animalService.animalService.delete(Number(req.params.id));
     res.status(204).send();
   } catch (error) {
     next(error);
