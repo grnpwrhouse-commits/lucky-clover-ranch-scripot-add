@@ -369,23 +369,73 @@ export default function App() {
                 </div>
               )}
 
-              {activeTab === 'rentals' && (
+              {activeTab === 'rentals' && (() => {
+                // UI Validation: filter out rentals with illogical date ranges
+                const validRentals = filteredRentals.filter(r => new Date(r.startDate) <= new Date(r.endDate));
+                const now = new Date();
+                return (
                 <div className="space-y-3">
-                  {filteredRentals.map(rental => (
-                    <motion.div key={rental.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white border border-slate-200 rounded-2xl p-5 flex items-center justify-between hover:border-emerald-200 hover:shadow-sm transition-all">
-                      <div className="flex items-center gap-5">
-                        <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-2xl">{getCat(rental.animal?.category ?? 'rodeo').emoji}</div>
+                  {validRentals.length === 0 && <EmptyState icon={Calendar} label="No valid rental records found." />}
+                  {validRentals.map(rental => {
+                    const start = new Date(rental.startDate);
+                    const end = new Date(rental.endDate);
+                    const isCompleted = now > end;
+                    const isActive = start <= now && end >= now;
+                    const daysLeft = Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    const daysUntil = Math.ceil((start.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                    return (
+                    <motion.div key={rental.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all">
+                      <div className="flex justify-between items-start mb-4">
                         <div>
-                          <div className="flex items-center gap-2 mb-1"><span className="font-bold text-slate-900">{rental.animal?.name ?? `#${rental.animalId}`}</span><span className="text-slate-300">→</span><span className="text-slate-600">{rental.client?.name ?? `#${rental.clientId}`}</span></div>
-                          <div className="flex items-center gap-4 text-xs text-slate-400"><span>{new Date(rental.startDate).toLocaleDateString()} – {new Date(rental.endDate).toLocaleDateString()}</span><span className="font-bold text-slate-700">${Number(rental.price).toLocaleString()}</span></div>
+                          <h4 className="text-lg font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+                            {rental.animal?.name ?? `Animal #${rental.animalId}`}
+                          </h4>
+                          <div className="flex items-center text-slate-500 text-sm mt-1">
+                            <Users className="w-4 h-4 mr-1.5" />
+                            <span className="font-medium text-slate-700">{rental.client?.name ?? `Client #${rental.clientId}`}</span>
+                          </div>
+                        </div>
+                        <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase ${
+                          isCompleted ? 'bg-slate-100 text-slate-600' :
+                          isActive ? 'bg-emerald-100 text-emerald-700' :
+                          'bg-amber-100 text-amber-700'
+                        }`}>
+                          {isCompleted ? 'Completed' : isActive ? 'Active' : 'Pending'}
+                        </span>
+                      </div>
+                      <div className="space-y-3 pt-3 border-t border-slate-100">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 flex items-center">
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Schedule
+                          </span>
+                          <span className="font-semibold text-slate-800">
+                            {start.toLocaleDateString()} – {end.toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-slate-500 flex items-center">
+                            <DollarSign className="w-4 h-4 mr-2" />
+                            Rental Value
+                          </span>
+                          <span className="font-bold text-slate-900 text-base">
+                            ${Number(rental.price).toLocaleString()}
+                          </span>
                         </div>
                       </div>
-                      <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase ${statusColor(rental.status)}`}>{statusIcon(rental.status)}{rental.status}</span>
+                      <div className="mt-4 pt-3 flex items-center justify-center rounded-lg bg-slate-50 text-xs font-bold uppercase tracking-widest">
+                        {isCompleted ? (
+                          <span className="text-slate-400 py-2">Rental Period Completed</span>
+                        ) : isActive ? (
+                          <span className="text-emerald-600 py-2">{daysLeft} Days Remaining</span>
+                        ) : (
+                          <span className="text-amber-600 py-2">Starts in {daysUntil} Days</span>
+                        )}
+                      </div>
                     </motion.div>
-                  ))}
-                  {filteredRentals.length === 0 && <EmptyState icon={Calendar} label="No rentals found" />}
+                  )})}
                 </div>
-              )}
+              );})()}
 
             </motion.div>
           </AnimatePresence>
