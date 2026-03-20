@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Dashboard from './Dashboard';
 
-const API = '/api';
+const API = 'https://victorious-abundance-production-cc5f.up.railway.app/api';
 
 interface Animal { id: number; tagNumber: string; name: string; breed: string; status: string; dateOfBirth: string; notes?: string; category: string; }
 interface Client { id: number; name: string; phone: string; email: string; organization?: string; }
