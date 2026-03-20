@@ -1,60 +1,60 @@
-import prisma from '../lib/prisma.ts';
+import prisma from '../lib/prisma';
 
-export const getAllAnimals = async () => {
-  return prisma.animal.findMany({
-    include: { healthRecords: true, rentals: true },
-  });
-};
+export const animalService = {
+  getAll: async () => {
+    return prisma.animal.findMany();
+  },
 
-export const getAnimalById = async (id: number) => {
-  return prisma.animal.findUnique({
-    where: { id },
-    include: { healthRecords: true, rentals: true },
-  });
-};
+  getById: async (id: number) => {
+    return prisma.animal.findUnique({ where: { id } });
+  },
 
-export const createAnimal = async (data: any) => {
-  return prisma.animal.create({ data });
-};
+  create: async (data: any) => {
+    return prisma.animal.create({ data });
+  },
 
-export const updateAnimal = async (id: number, data: any) => {
-  return prisma.animal.update({
-    where: { id },
-    data,
-  });
-};
+  update: async (id: number, data: any) => {
+    return prisma.animal.update({ where: { id }, data });
+  },
 
-export const deleteAnimal = async (id: number) => {
-  return prisma.animal.delete({
-    where: { id },
-  });
-};
+  delete: async (id: number) => {
+    return prisma.animal.delete({ where: { id } });
+  },
 
-export const getAnimalsWithAvailability = async () => {
-  const animals = await prisma.animal.findMany({
-    include: {
-      rentals: true,
-    },
-  });
+  getWithAvailability: async () => {
+    const animals = await prisma.animal.findMany({
+      include: {
+        rentals: {
+          where: {
+            OR: [
+              { status: "active" },
+              { status: "pending" },
+            ],
+          },
+        },
+      },
+    });
 
-  const today = new Date();
+    const now = new Date();
 
-  return animals.map((animal) => {
-    const activeRental = animal.rentals.find(
-      (r) =>
-        new Date(r.startDate) <= today &&
-        new Date(r.endDate) >= today
-    );
+    return animals.map((animal) => {
+      const activeRental = animal.rentals.find(
+        (r) => r.status === "active"
+      );
 
-    const futureRentals = animal.rentals
-      .filter((r) => new Date(r.startDate) > today)
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+      const upcomingRental = animal.rentals.find(
+        (r) => r.status === "pending" && new Date(r.startDate) > now
+      );
 
-    return {
-      ...animal,
-      isAvailable: !activeRental,
-      currentRental: activeRental || null,
-      nextRental: futureRentals[0] || null,
-    };
-  });
+      return {
+        id: animal.id,
+        name: animal.name,
+        tagNumber: animal.tagNumber,
+        breed: animal.breed,
+        status: animal.status,
+        category: animal.category,
+        isAvailable: !activeRental && animal.status !== "injured",
+      };
+    });
+  },
 };

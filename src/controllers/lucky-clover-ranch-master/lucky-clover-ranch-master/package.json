@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "npx tsx server.ts",
     "dev": "tsx server.ts",
     "frontend": "vite",
-    "build": "prisma generate && vite build",
+    "build": "prisma generate",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
