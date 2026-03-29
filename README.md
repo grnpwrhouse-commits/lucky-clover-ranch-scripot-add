@@ -1,12 +1,30 @@
-﻿# Lucky Clover Ranch
+﻿# Lucky Clover Ranch ðŸ€
 
-AI Studio app - a full-stack React/Vite + Express/TSX project.
+Bull-rental dashboard and management SaaS for LATAM.
 
-## Quick Start
-1. Clone: git clone git@github.com:laserpanama/lucky-clover-ranch.git
-2. Install: npm install
-3. Set API key in .env.local
-4. Run: npm run dev
+## Structure
+- `backend/` â€” Express + Prisma API â†’ Railway
+- `frontend/` â€” React + Vite UI â†’ Vercel
 
-## License
-MIT
+## Run locally
+
+### Backend
+```
+cd backend
+npm install
+npx prisma migrate dev
+npm run dev
+```
+Runs on http://localhost:3000
+
+### Frontend
+```
+cd frontend
+npm install
+npm run dev
+```
+Runs on http://localhost:5173
+
+## Live
+- API: https://victorious-abundance-production-cc5f.up.railway.app
+- App: https://lucky-clover-ranch.vercel.app
